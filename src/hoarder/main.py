@@ -1,12 +1,14 @@
 from .core import config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from .resource.routes import resource_router
 import uvicorn
 import logging
 
 app = FastAPI()
-app.router.prefix = "api/v1"
+app.router.prefix = "/api/v1"
 origins = [config.CORS_ALLOWED]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -14,6 +16,8 @@ app.add_middleware(
     allow_methods=["POST", "GET", "DELETE"],
     allow_headers=["*"],
 )
+
+app.include_router(resource_router)
 
 @app.get("/")
 async def root():
