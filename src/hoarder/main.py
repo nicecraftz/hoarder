@@ -1,11 +1,18 @@
 from .core import config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .resource.routes import resource_router
 import uvicorn
 import logging
 
-app = FastAPI()
+from contextlib import asynccontextmanager
+from hoarder.core.db import create_db_and_tables
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_db_and_tables()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 app.router.prefix = "/api/v1"
 origins = [config.CORS_ALLOWED]
 
@@ -17,11 +24,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(resource_router)
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
 
 
 def main():
