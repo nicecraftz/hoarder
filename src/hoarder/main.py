@@ -7,6 +7,8 @@ import logging
 from contextlib import asynccontextmanager
 from hoarder.core.db import create_db_and_tables
 
+from hoarder.course.routes import course
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db_and_tables()
@@ -24,6 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(course)
 
 @app.get("/")
 async def root():
