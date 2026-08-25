@@ -11,18 +11,20 @@ class ResourceType(str, Enum):
     FILE = "file"
     LINK = "link"
 
-class Resource(SQLModel, table = True):
-    __tablename__ = "resources"
-    id: int | None = Field(primary_key=True, index=True, default=None)
-    name: str = Field(nullable=False, index=True)
-    author: str = Field(nullable=False)
-
+class BaseResource(SQLModel):
+    name: str
+    author: str
     type: ResourceType
     path: str | None = Field(default=None)
     url: str | None = Field(default=None)
-
     course_id: int = Field(foreign_key="university_courses.id")
 
+class ResourceCreate(BaseResource):
+    pass
+
+class Resource(BaseResource, table = True):
+    __tablename__ = "resources"
+    id: int | None = Field(primary_key=True, index=True, default=None)
     course: "UniversityCourse" = Relationship(back_populates="resources")
 
 
