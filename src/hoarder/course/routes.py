@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from sqlmodel import Session
 
 import hoarder.course.application.service as service
@@ -15,3 +15,8 @@ async def get_all_courses(session: Session = Depends(get_session)):
 @course.post("/", response_model=CoursePublic)
 async def create_course(create_payload: CourseCreate, session: Session = Depends(get_session)):
     return service.create_course(session, create_payload)
+
+@course.delete("/{id}")
+async def delete_course(id: int, session: Session = Depends(get_session)):
+    service.delete_course(session, id)
+    return Response(status_code=200)
