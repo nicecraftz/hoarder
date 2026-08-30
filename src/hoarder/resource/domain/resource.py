@@ -1,6 +1,7 @@
 from sqlmodel import SQLModel, Field, Relationship
 from enum import Enum
 
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -12,8 +13,8 @@ class ResourceType(str, Enum):
     LINK = "link"
 
 class BaseResource(SQLModel):
-    name: str
-    author: str
+    name: str = Field(nullable=False)
+    author: str = Field(nullable=False)
     type: ResourceType
     path: str | None = Field(default=None)
     url: str | None = Field(default=None)
