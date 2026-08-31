@@ -22,5 +22,10 @@ def serve_static_resource_by_id(id: int, session: Session = Depends(get_session)
     return FileResponse(path=path, status_code=200)
 
 @resources.post("/", response_model=ResourcePublic)
-def create_resource():
-    return service.create_resource()
+def create_link_resource(session: Session = Depends(get_session)):
+    return service.create_link_resource()
+
+@resources.post("/upload", response_model=ResourcePublic)
+def create_file_resource(session: Session = Depends(get_session)):
+    return service.create_file_resource()
+    
