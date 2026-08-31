@@ -1,4 +1,4 @@
-from ..domain.resource import Resource, ResourceType
+from ..domain.resource import Resource, ResourceType,ResourceFileCreate, ResourceLinkCreate
 from hoarder.core.exception import ProblemException
 from sqlmodel import Session, select
 
@@ -18,3 +18,16 @@ def get_resource_path_by_id(session: Session, id: int):
     if not resource.path:
         raise ProblemException(status=400, title="Invalid Resource Path", detail="You tried fetching a resource which has no file specfied.")
     return resource.path
+
+
+def create_link_resource(session: Session, payload: ResourceLinkCreate):
+    resource = Resource()
+    resource.name = payload.name
+    resource.url = payload.url
+    resource.author = payload.author
+    resource.course_id = payload.course_id
+    resource.type = ResourceType.LINK
+    session.add(resource)
+    session.commit()
+    session.refresh(resource)
+    return resource

@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, File, UploadFile, Form
+from typing import Annotated
 from fastapi.responses import FileResponse
 from sqlmodel import Session
 
 from hoarder.core.db import get_session
 import hoarder.resource.application.service as service
-from hoarder.resource.domain.resource import ResourcePublic
+from hoarder.resource.domain.resource import ResourcePublic, ResourceLinkCreate, ResourceFileCreate
 
 resources = APIRouter(prefix="/resources", tags=["resources"])
 
@@ -22,10 +23,9 @@ def serve_static_resource_by_id(id: int, session: Session = Depends(get_session)
     return FileResponse(path=path, status_code=200)
 
 @resources.post("/", response_model=ResourcePublic)
-def create_link_resource(session: Session = Depends(get_session)):
-    return service.create_link_resource()
+def create_link_resource(link_payload: ResourceLinkCreate, session: Session = Depends(get_session)):
+    return service.create_link_resource(session, link_payload)
 
 @resources.post("/upload", response_model=ResourcePublic)
-def create_file_resource(session: Session = Depends(get_session)):
-    return service.create_file_resource()
-    
+def create_file_resource(payload: Annotated[ResourceFileCreate, Form()], file: UploadFile = File(), session: Session = Depends(get_session)):
+    return service.create_file_resource(payload, file, session)

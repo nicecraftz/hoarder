@@ -27,6 +27,12 @@ class ResourceLinkCreate(SQLModel):
     url: HttpUrl
     course_id: int = Field(gt=0)
 
+class ResourceFileCreate(SQLModel):
+    name: str = Field(nullable=False)
+    author: str = Field(nullable=False)
+    course_id: int = Field(gt=0)
+
+
 class Resource(BaseResource, table = True):
     __tablename__ = "resources"
     id: int | None = Field(primary_key=True, index=True, default=None)
