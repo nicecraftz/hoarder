@@ -1,6 +1,7 @@
 from ..domain.resource import Resource, ResourceType,ResourceFileCreate, ResourceLinkCreate
 from hoarder.core.exception import ProblemException
 from sqlmodel import Session, select
+import hoarder.resource.application.storage_service as storage
 
 def get_all_resources(session: Session) -> list[Resource]:
     return session.exec(select(Resource)).all()
@@ -21,13 +22,24 @@ def get_resource_path_by_id(session: Session, id: int):
 
 
 def create_link_resource(session: Session, payload: ResourceLinkCreate):
-    resource = Resource()
-    resource.name = payload.name
-    resource.url = payload.url
-    resource.author = payload.author
-    resource.course_id = payload.course_id
-    resource.type = ResourceType.LINK
+    resource = Resource(name=payload.name, url=payload.url, author=payload.author, course_id=payload.course_id, type=ResourceType.LINK)
     session.add(resource)
     session.commit()
     session.refresh(resource)
     return resource
+
+def create_file_resource(session: Session, payload: ResourceFileCreate, upload: UploadFile) -> Resource:
+    key = storage.create_file(upload.file, upload.filename or "")
+    try:
+        resource = Resource(
+            name=payload.name, author=payload.author, course_id=payload.course_id,
+            type=ResourceType.FILE, path=key,
+        )
+        session.add(resource)
+        session.commit()
+        session.refresh(resource)
+        return resource
+    except BaseException:
+        session.rollback()
+        storage.delete_file(key)
+        raise

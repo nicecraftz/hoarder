@@ -10,22 +10,22 @@ from hoarder.resource.domain.resource import ResourcePublic, ResourceLinkCreate,
 resources = APIRouter(prefix="/resources", tags=["resources"])
 
 @resources.get("/", response_model=list[ResourcePublic])
-def get_all_resources(session: Session = Depends(get_session)):
+async def get_all_resources(session: Session = Depends(get_session)):
     return service.get_all_resources(session)
 
 @resources.get("/{id}", response_model=ResourcePublic)
-def get_resource_by_id(id: int, session: Session = Depends(get_session)):
+async def get_resource_by_id(id: int, session: Session = Depends(get_session)):
     return service.get_resource_with_id(session, id)
 
 @resources.get("/{id}/static", response_model=FileResponse)
-def serve_static_resource_by_id(id: int, session: Session = Depends(get_session)):
+async def serve_static_resource_by_id(id: int, session: Session = Depends(get_session)):
     path = service.get_resource_path_by_id(session, id)
     return FileResponse(path=path, status_code=200)
 
 @resources.post("/", response_model=ResourcePublic)
-def create_link_resource(link_payload: ResourceLinkCreate, session: Session = Depends(get_session)):
+async def create_link_resource(link_payload: ResourceLinkCreate, session: Session = Depends(get_session)):
     return service.create_link_resource(session, link_payload)
 
 @resources.post("/upload", response_model=ResourcePublic)
-def create_file_resource(payload: Annotated[ResourceFileCreate, Form()], file: UploadFile = File(), session: Session = Depends(get_session)):
-    return service.create_file_resource(payload, file, session)
+async def create_file_resource(payload: Annotated[ResourceFileCreate, Form()], file: UploadFile = File(), session: Session = Depends(get_session)):
+    return service.create_file_resource(session, payload, file)
