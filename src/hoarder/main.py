@@ -12,6 +12,7 @@ from contextlib import asynccontextmanager
 from hoarder.core.exception import ProblemException, problem_response, status_phrase
 from hoarder.core.db import create_db_and_tables
 from hoarder.course.routes import course
+from hoarder.resource.routes import resources
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -64,6 +65,7 @@ app.add_middleware(
 )
 
 app.include_router(course)
+app.include_router(resources)
 
 def main():
     if config.ADMIN_PASSWORD == config.DEFAULT_ADMIN_PASSWORD:
